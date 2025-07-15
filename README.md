@@ -90,89 +90,121 @@
 ```mermaid
 classDiagram
     direction TB
-    %% 유저 정보와 잔액을 관리하는 클래스
+
+    %% User (유저 및 잔액)
     class User {
-        +UUID id : User 고유 식별자
-        +String userName : 유저명
-        +int balance : 현재 보유 잔액
-        +getBalance(id) : 유저의 잔액을 조회하는 메서드
-        +chargeBalance(id, amount) : 유저의 잔액을 충전하는 메서드
+        +UUID id
+        +String userName
+        +int balance
+        +int getBalance() : 사용자의 현재 보유 잔액을 반환
+        +void chargeBalance(int amount) : 잔액을 입력 금액만큼 충전
+        +boolean deductBalance(int amount) : 잔액 차감(실패시 false)
     }
-    %% 대기열 토큰을 관리하는 클래스
+
+    %% QueueToken (대기열 토큰)
     class QueueToken {
-        +String token : 대기열 토큰 값
-        +UUID userId : 유저 고유 식별자
-        +int position : 대기열의 순번
-        +DateTime issuedAt : 토큰 발급 시간
-        +DateTime expiresAt : 토큰 만료 시간
-        +boolean isExpired(DateTime now) : 주어진 시간 기준으로 만료여부 반환
+        +String token
+        +UUID userId
+        +int position
+        +DateTime issuedAt
+        +DateTime expiresAt
+        +boolean isExpired(DateTime now) : 토큰 만료 여부 반환
+        +int getCurrentPosition() : 대기열 내 현재 순번 반환
     }
-    %% 이벤트 카테고리(콘서트, 강연, 스포츠 등)를 관리하는 클래스
-    class Category {
-        +Long id : 카테고리 고유 식별자
-        +String code : 카테고리 코드
-        +String name : 카테고리명, 예: CONCERT
+
+    %% BalanceLog (충전 및 사용 로그)
+    class BalanceLog {
+        +Long id
+        +UUID userId
+        +int amount
+        +String type
+        +DateTime createdAt
+        +static BalanceLog createCharge(UUID userId, int amount) : 충전 로그 객체 생성
+        +static BalanceLog createPayment(UUID userId, int amount) : 결제 로그 객체 생성
     }
-    %% 실제 이벤트(공연, 경기 등)를 관리하는 클래스
+
+    %% Event (공연/콘서트)
     class Event {
-        +Long id : 이벤트 고유 식별자
-        +Long categoryId : 카테고리 고유 식별자
-        +String code : 이벤트 코드, 예: WORLDMUSIC20250713
-        +String name : 이벤트명
-        +String description : 이벤트 설명
-        +Boolean enable : 이벤트 활성 여부
+        +Long id
+        +String name
+        +String code
+        +String description
+        +List~EventSchedule~ getSchedules() : 이벤트의 전체 일정 리스트 반환
     }
-    %% 이벤트의 일정(회차, 날짜/시간)을 관리하는 클래스
+
+    %% EventSchedule (공연 일정/회차)
     class EventSchedule {
-        +Long id : 이벤트 일정 고유 식별자
-        +Long eventId : 이벤트 고유 식별자
-        +LocalDateTime startDateTime : 이벤트 시작 일시
-        +LocalDateTime endDateTime : 이벤트 마감 일시
+        +Long id
+        +Long eventId
+        +LocalDateTime startDateTime
+        +LocalDateTime endDateTime
+        +List~Seat~ getAvailableSeats() : 예약가능 좌석 목록 반환
+        +List~Seat~ getAllSeats() : 전체 좌석 목록 반환
     }
-    %% 좌석 정보를 관리하는 클래스
+
+    %% Seat (좌석)
     class Seat {
-        +Long id : 좌석 고유 식별자
-        +Long scheduleId : 일정 고유 식별자
-        +int seatNumber : 좌석번호
-        +String seatType : 좌석 타입, 예: STANDARD, VIP, STANDING 등
-        +String status : 좌석상태, 예: 예약 가능, 예약 대기, 예약 불가
+        +Long id
+        +Long scheduleId
+        +int seatNumber
+        +String seatType
+        +String status
+        +DateTime holdExpiresAt
+        +boolean isAvailable() : 현재 예약 가능 여부 반환
+        +boolean isHoldExpired(DateTime now) : 임시 배정 만료 여부 반환
+        +void hold(UUID userId, DateTime expiresAt) : 사용자를 임시 배정(만료시각 포함)
+        +void releaseHold() : 임시 배정 해제, 예약 가능 상태로 복구
+        +void confirm(UUID userId) : 예약 확정 처리
     }
-    %% 좌석 예약 내역을 관리하는 클래스
+
+    %% Reservation (예약 내역)
     class Reservation {
-        +Long id : 예약 고유 식별자 
-        +UUID userId : 유저 고유 식별자
-        +Long seatId : 좌석 고유 식별자
-        +Long scheduleId : 이벤트 스케줄 고유 식별자
-        +String status: 예약 상태, 예: 대기, 확정, 취소
-        +DateTime reservedAt : 예약 일시
-        +DateTime canceledAt : 취소 일시 
+        +Long id
+        +UUID userId
+        +Long seatId
+        +Long scheduleId
+        +String status
+        +DateTime reservedAt
+        +DateTime expiresAt
+        +DateTime canceledAt
+        +static Reservation createTemp(UUID userId, Long seatId, Long scheduleId, DateTime expiresAt) : 임시 예약 생성
+        +void confirm() : 예약 확정
+        +void cancel() : 예약 취소 혹은 만료 처리
+        +boolean isExpired(DateTime now) : 만료 여부 반환
     }
-    %% 결제 내역을 관리하는 클래스
+
+    %% Payment (결제 내역)
     class Payment {
-        +Long id : 결제 고유 식별자
-        +UUID userId : 유저 고유 식별자
-        +Long reservationId : 예약 고유 식별자
-        +int amount : 구매금액
-        +String status : 구매상태, 예: 결제완료, 결제대기, 결제취소
-        +DateTime paidAt : 구매일시
-        +DateTime canceledAt :취소 일시
+        +Long id
+        +UUID userId
+        +Long reservationId
+        +int amount
+        +String status
+        +DateTime paidAt
+        +DateTime canceledAt
+        +static Payment create(UUID userId, Long reservationId, int amount) : 결제 내역 객체 생성
+        +void complete() : 결제 완료 처리
+        +void fail() : 결제 실패 처리
+        +void cancel() : 결제 취소 처리
     }
-    User "1" -- "0..*" QueueToken : has
-    User "1" -- "0..*" Reservation : makes
-    User "1" -- "0..*" Payment : pays
-    Category "1" -- "0..*" Event : has
-    Event "1" -- "0..*" EventSchedule : has
-    EventSchedule "1" -- "0..*" Seat : includes
-    Seat "1" -- "0..1" Reservation : reserved_by
-    Reservation "1" -- "0..1" Payment : paid_by
-    Event "1" -- "0..*" Reservation : for
+
+    %% 관계
+    User "1" -- "0..*" QueueToken : 유저가 보유한 대기열 토큰
+    User "1" -- "0..*" Reservation : 유저의 예약 목록
+    User "1" -- "0..*" Payment : 유저의 결제 내역
+    User "1" -- "0..*" BalanceLog : 유저의 잔액 이력
+    Event "1" -- "0..*" EventSchedule : 이벤트의 일정
+    EventSchedule "1" -- "0..*" Seat : 일정별 좌석
+    Seat "1" -- "0..1" Reservation : 좌석의 예약 상태
+    Reservation "1" -- "0..1" Payment : 예약의 결제 정보
+    EventSchedule "1" -- "0..*" Reservation : 일정의 예약 정보
 ```
 
 ## ERD
 ```mermaid
 erDiagram
     USER {
-        UUID id PK "User 고유 식별자"
+        UUID id PK "유저 고유 식별자"
         STRING userName "유저명"
         INT balance "현재 보유 잔액"
         DATETIME insertAt "생성일시"
@@ -186,6 +218,13 @@ erDiagram
         DATETIME expiresAt "토큰 만료 시간"
         DATETIME insertAt "생성일시"
         DATETIME updateAt "수정일시"
+    }
+    BALANCE_LOG {
+        LONG id PK "잔액 이력 고유 식별자"
+        UUID userId FK "유저 고유 식별자"
+        INT amount "충전/사용 금액"
+        STRING type "이력 유형 (CHARGE, PAYMENT 등)"
+        DATETIME createdAt "이력 발생일시"
     }
     CATEGORY {
         LONG id PK "카테고리 고유 식별자"
@@ -216,8 +255,9 @@ erDiagram
         LONG id PK "좌석 고유 식별자"
         LONG scheduleId FK "일정 고유 식별자"
         INT seatNumber "좌석번호"
-        STRING seatType "좌석 타입"
-        STRING status "좌석상태"
+        STRING seatType "좌석 타입 (STANDARD, VIP 등)"
+        STRING status "좌석상태 (AVAILABLE, HOLD, RESERVED 등)"
+        DATETIME holdExpiresAt "임시 배정 만료 시각"
         DATETIME insertAt "생성일시"
         DATETIME updateAt "수정일시"
     }
@@ -226,8 +266,9 @@ erDiagram
         UUID userId FK "유저 고유 식별자"
         LONG seatId FK "좌석 고유 식별자"
         LONG scheduleId FK "이벤트 스케줄 고유 식별자"
-        STRING status "예약 상태"
+        STRING status "예약 상태 (TEMP, CONFIRMED, CANCEL 등)"
         DATETIME reservedAt "예약 일시"
+        DATETIME expiresAt "임시 예약 만료 시각"
         DATETIME canceledAt "취소 일시"
         DATETIME insertAt "생성일시"
         DATETIME updateAt "수정일시"
@@ -236,27 +277,28 @@ erDiagram
         LONG id PK "결제 고유 식별자"
         UUID userId FK "유저 고유 식별자"
         LONG reservationId FK "예약 고유 식별자"
-        INT amount "구매금액"
-        STRING status "구매상태"
-        DATETIME paidAt "구매일시"
-        DATETIME canceledAt "취소 일시"
+        INT amount "결제 금액"
+        STRING status "결제상태 (COMPLETE, FAILED, CANCELED 등)"
+        DATETIME paidAt "결제 일시"
+        DATETIME canceledAt "결제 취소 일시"
         DATETIME insertAt "생성일시"
         DATETIME updateAt "수정일시"
     }
 
-    USER ||--o{ QUEUE_TOKEN : "has"
-    USER ||--o{ RESERVATION : "makes"
-    USER ||--o{ PAYMENT : "pays"
-    CATEGORY ||--o{ EVENT : "has"
-    EVENT ||--o{ EVENT_SCHEDULE : "has"
-    EVENT_SCHEDULE ||--o{ SEAT : "includes"
-    SEAT ||--o| RESERVATION : "reserved_by"
-    RESERVATION ||--o| PAYMENT : "paid_by"
-    EVENT ||--o{ RESERVATION : "for"
+    USER ||--o{ QUEUE_TOKEN : "유저의 대기열 토큰"
+    USER ||--o{ RESERVATION : "유저의 예약"
+    USER ||--o{ PAYMENT : "유저의 결제"
+    USER ||--o{ BALANCE_LOG : "유저의 잔액 이력"
+    CATEGORY ||--o{ EVENT : "카테고리별 이벤트"
+    EVENT ||--o{ EVENT_SCHEDULE : "이벤트별 일정"
+    EVENT_SCHEDULE ||--o{ SEAT : "일정별 좌석"
+    SEAT ||--o| RESERVATION : "좌석의 예약"
+    RESERVATION ||--o| PAYMENT : "예약의 결제"
+    EVENT_SCHEDULE ||--o{ RESERVATION : "일정의 예약"
 ```
 
 ## 시퀀스 다이어그램
-1. 대기열 토큰 발급 및 대기열 조회
+1. 대기열 토큰 발급 및 대기 순번 조회
 ```mermaid
 sequenceDiagram
     participant User
@@ -265,11 +307,11 @@ sequenceDiagram
 
     User->>QueueService: 대기열 진입 요청
     QueueService->>QueueTokenRepository: 대기열 토큰 생성
-    QueueTokenRepository-->>QueueService: 토큰 정보 반환
-    QueueService-->>User: 대기열 토큰/순번 반환
+    QueueTokenRepository-->>QueueService: 생성된 토큰/정보 반환
+    QueueService-->>User: 대기열 토큰 및 순번 반환
 
-    User->>QueueService: 대기열 순번 조회
-    QueueService->>QueueTokenRepository: 토큰 정보 조회
+    User->>QueueService: 대기열 순번 조회 요청
+    QueueService->>QueueTokenRepository: 토큰/순번 정보 조회
     QueueTokenRepository-->>QueueService: 토큰/순번 반환
     QueueService-->>User: 대기열 상태 반환
 ```
@@ -282,18 +324,18 @@ sequenceDiagram
     participant EventScheduleRepository
     participant SeatRepository
 
-    User->>EventService: 예약 가능 날짜 목록 조회
-    EventService->>EventScheduleRepository: 활성화된 일정 조회
+    User->>EventService: 예약 가능 날짜 목록 조회(토큰 인증)
+    EventService->>EventScheduleRepository: 활성 일정 전체 조회
     EventScheduleRepository-->>EventService: 일정 목록 반환
-    EventService-->>User: 일정 목록 반환
+    EventService-->>User: 예약 가능 일정 반환
 
-    User->>EventService: 특정 일정의 좌석 정보 조회
+    User->>EventService: 특정 일정의 좌석 정보 조회(토큰 인증)
     EventService->>SeatRepository: 좌석 목록 및 상태 조회
     SeatRepository-->>EventService: 좌석 정보 반환
     EventService-->>User: 좌석 정보 반환
 ```
 
-3. 좌석 예약 요청
+3. 좌석 예약 요청 및 임시 배정
 ```mermaid
 sequenceDiagram
     participant User
@@ -301,32 +343,48 @@ sequenceDiagram
     participant SeatRepository
     participant ReservationRepository
 
-    User->>ReservationService: 좌석 예약 요청(일정, 좌석)
-    ReservationService->>SeatRepository: 좌석 상태 확인 및 Lock
-    SeatRepository-->>ReservationService: 좌석 사용 가능 여부 반환
-    ReservationService->>ReservationRepository: 임시 예약 생성
-    ReservationRepository-->>ReservationService: 예약 정보 반환
-    ReservationService-->>User: 예약 성공/실패 응답
+    User->>ReservationService: 좌석 예약 요청(토큰, 일정, 좌석)
+    ReservationService->>SeatRepository: 좌석 상태 Lock/검증
+    SeatRepository-->>ReservationService: 좌석 사용 가능/불가 응답
+    ReservationService->>ReservationRepository: 임시 예약 생성(만료시각 포함)
+    ReservationRepository-->>ReservationService: 임시 예약 정보 반환
+    ReservationService->>SeatRepository: 좌석 상태 HOLD 및 holdExpiresAt 설정
+    ReservationService-->>User: 임시 예약 성공/실패 알림
 ```
-4. 잔액 충전/조회
+
+4. 임시 예약 만료 및 해제
+```mermaid
+sequenceDiagram
+    participant Scheduler
+    participant ReservationRepository
+    participant SeatRepository
+
+    Scheduler->>ReservationRepository: 임시 예약 만료 체크(스케줄러 주기)
+    ReservationRepository->>SeatRepository: HOLD 좌석 해제
+    ReservationRepository->>ReservationRepository: 임시 예약 상태 CANCEL 처리
+```
+
+5. 잔액 충전/조회
 ```mermaid
 sequenceDiagram
     participant User
     participant UserService
     participant UserRepository
+    participant BalanceLogRepository
 
     User->>UserService: 잔액 충전 요청(금액)
     UserService->>UserRepository: 잔액 증가 처리
     UserRepository-->>UserService: 업데이트 결과 반환
+    UserService->>BalanceLogRepository: 충전 로그 기록
     UserService-->>User: 충전 결과 반환
 
     User->>UserService: 잔액 조회 요청
-    UserService->>UserRepository: 잔액 조회
+    UserService->>UserRepository: 잔액 정보 조회
     UserRepository-->>UserService: 잔액 반환
     UserService-->>User: 잔액 반환
 ```
 
-5. 결제 처리
+6. 결제 및 예약 확정
 ```mermaid
 sequenceDiagram
     participant User
@@ -334,14 +392,18 @@ sequenceDiagram
     participant ReservationRepository
     participant PaymentRepository
     participant UserRepository
+    participant SeatRepository
+    participant QueueTokenRepository
 
-    User->>PaymentService: 결제 요청(예약ID, 금액)
-    PaymentService->>ReservationRepository: 예약 상태/만료 확인
-    ReservationRepository-->>PaymentService: 예약 유효성 반환
-    PaymentService->>UserRepository: 잔액 차감
+    User->>PaymentService: 결제 요청(예약ID, 토큰)
+    PaymentService->>ReservationRepository: 예약 유효성/만료 체크
+    ReservationRepository-->>PaymentService: 예약 상태 반환
+    PaymentService->>UserRepository: 잔액 차감 요청
     UserRepository-->>PaymentService: 잔액 차감 결과 반환
-    PaymentService->>PaymentRepository: 결제 내역 생성
+    PaymentService->>PaymentRepository: 결제 내역 기록
     PaymentRepository-->>PaymentService: 결제 정보 반환
-    PaymentService->>ReservationRepository: 예약 상태 확정 처리
-    PaymentService-->>User: 결제 성공/실패 응답
+    PaymentService->>ReservationRepository: 예약 상태 CONFIRMED 처리
+    PaymentService->>SeatRepository: 좌석 RESERVED 처리
+    PaymentService->>QueueTokenRepository: 토큰 만료 처리(결제 완료 후)
+    PaymentService-->>User: 결제 결과 및 상태 반환
 ```
