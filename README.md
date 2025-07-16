@@ -103,8 +103,9 @@ classDiagram
 
     %% QueueToken (대기열 토큰)
     class QueueToken {
-        +String token
+        +Long id
         +UUID userId
+        +String token
         +int position
         +DateTime issuedAt
         +DateTime expiresAt
@@ -211,8 +212,9 @@ erDiagram
         DATETIME updateAt "수정일시"
     }
     QUEUE_TOKEN {
-        STRING token PK "대기열 토큰 값"
+        Long id PK "대기열 토큰 고유 식별자"
         UUID userId FK "유저 고유 식별자"
+        STRING token "대기열 토큰 값"
         INT position "대기열의 순번"
         DATETIME issuedAt "토큰 발급 시간"
         DATETIME expiresAt "토큰 만료 시간"
