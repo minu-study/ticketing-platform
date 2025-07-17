@@ -39,13 +39,16 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.projectlombok:lombok:1.18.38")
 
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
 	// Docs
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 	asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.0")
+	
+	// RestDocs
+	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 	
 	// RestDocs API Spec
 	testImplementation("com.epages:restdocs-api-spec:0.19.4")
