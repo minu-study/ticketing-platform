@@ -17,13 +17,4 @@ public class Userservice {
     }
 
 
-    @Transactional
-    public User createUser(String userName) {
-        UUID userId = UUID.randomUUID();
-        User user = new User(userId, userName, 0);
-        return userRepository.save(user);
-    }
-
-
-
 }
