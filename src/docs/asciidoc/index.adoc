@@ -1,54 +1,40 @@
-= HH Plus API Documentation
+= HH Plus API 문서
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :sectlinks:
+:operation-curl-request-title: Example request
+:operation-http-response-title: Example response
 
 [[overview]]
-= Overview
+= 개요
+
+HH Plus 서비스의 REST API 문서입니다.
 
 [[overview-http-verbs]]
-== HTTP Methods
+== HTTP 동사
+
+본 REST API에서 사용하는 HTTP 동사(verbs)는 가능한 한 표준 HTTP와 REST 규약을 따릅니다.
 
 |===
-| Method | Usage
+| 동사 | 용법
 
 | `GET`
-| 리소스 조회
+| 리소스를 가져올 때 사용
 
 | `POST`
-| 리소스 생성
+| 새 리소스를 만들 때 사용
 
 | `PUT`
-| 리소스 수정
+| 기존 리소스를 수정할 때 사용
 
 | `DELETE`
-| 리소스 삭제
+| 기존 리소스를 삭제할 때 사용
 |===
 
-[[overview-http-status-codes]]
-== HTTP Status Codes
 
-|===
-| Status code | Usage
+include::user.adoc[]
 
-| `200 OK`
-| 요청 성공
 
-| `201 Created`
-| 리소스 생성 성공
-
-| `400 Bad Request`
-| 잘못된 요청
-
-| `404 Not Found`
-| 리소스를 찾을 수 없음
-
-| `500 Internal Server Error`
-| 서버 에러
-|===
-
-[[resources]]
-= Resources
