@@ -3,6 +3,8 @@ package kr.hhplus.be.server.domain.reservation.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
 import kr.hhplus.be.server.domain.seat.entity.Seat;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,6 +15,8 @@ import java.util.UUID;
 
 @Entity
 @DynamicUpdate
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "reservation")
 @EntityListeners(AuditingEntityListener.class)
 public class Reservation {
@@ -57,18 +61,5 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleId", insertable = false, updatable = false)
     private EventSchedule eventSchedule;
-
-    protected Reservation() {
-    }
-
-    private Reservation(UUID userId, Long seatId, Long scheduleId, String status,
-                        LocalDateTime reservedAt, LocalDateTime expiresAt) {
-        this.userId = userId;
-        this.seatId = seatId;
-        this.scheduleId = scheduleId;
-        this.status = status;
-        this.reservedAt = reservedAt;
-        this.expiresAt = expiresAt;
-    }
 
 }

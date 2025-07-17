@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.seat.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,6 +14,8 @@ import java.util.UUID;
 
 @Entity
 @DynamicUpdate
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "seat")
 @EntityListeners(AuditingEntityListener.class)
 public class Seat {
@@ -47,14 +51,5 @@ public class Seat {
     @JoinColumn(name = "scheduleId", insertable = false, updatable = false)
     private EventSchedule eventSchedule;
 
-    protected Seat() {
-    }
-
-    public Seat(Long scheduleId, int seatNumber, String seatType) {
-        this.scheduleId = scheduleId;
-        this.seatNumber = seatNumber;
-        this.seatType = seatType;
-        this.status = "AVAILABLE";
-    }
 
 }

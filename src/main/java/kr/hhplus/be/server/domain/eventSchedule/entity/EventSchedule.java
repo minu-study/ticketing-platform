@@ -3,6 +3,8 @@ package kr.hhplus.be.server.domain.eventSchedule.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.event.entity.Event;
 import kr.hhplus.be.server.domain.seat.entity.Seat;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -12,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "event_schedule")
 @EntityListeners(AuditingEntityListener.class)
 public class EventSchedule {
@@ -44,13 +48,5 @@ public class EventSchedule {
     @OneToMany(mappedBy = "scheduleId", fetch = FetchType.LAZY)
     private List<Seat> seats = new ArrayList<>();
 
-    protected EventSchedule() {
-    }
-
-    public EventSchedule(Long eventId, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        this.eventId = eventId;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-    }
 
 }

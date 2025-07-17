@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.payment.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.reservation.entity.Reservation;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -10,6 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "PAYMENT")
 @DynamicUpdate
@@ -50,14 +54,5 @@ public class Payment {
     @JoinColumn(name = "reservationId", insertable = false, updatable = false)
     private Reservation reservation;
 
-    protected Payment() {
-    }
-
-    private Payment(UUID userId, Long reservationId, int amount, String status) {
-        this.userId = userId;
-        this.reservationId = reservationId;
-        this.amount = amount;
-        this.status = status;
-    }
 
 }

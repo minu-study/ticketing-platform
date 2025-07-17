@@ -1,6 +1,10 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,6 +15,10 @@ import java.util.UUID;
 
 @Entity
 @DynamicUpdate
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class User {
@@ -32,14 +40,5 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updateAt;
-
-    protected User() {
-    }
-
-    public User(UUID id, String userName, int balance) {
-        this.id = id;
-        this.userName = userName;
-        this.balance = balance;
-    }
 
 }

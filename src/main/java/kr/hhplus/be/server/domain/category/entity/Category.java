@@ -1,12 +1,16 @@
 package kr.hhplus.be.server.domain.category.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "category")
 @EntityListeners(AuditingEntityListener.class)
@@ -29,13 +33,5 @@ public class Category {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updateAt;
-
-    protected Category() {
-    }
-
-    public Category(String code, String name) {
-        this.code = code;
-        this.name = name;
-    }
 
 }

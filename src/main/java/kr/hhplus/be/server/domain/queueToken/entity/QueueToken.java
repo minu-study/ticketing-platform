@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.queueToken.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @DynamicUpdate
 @Table(name = "queue_token")
 @EntityListeners(AuditingEntityListener.class)
@@ -42,15 +46,5 @@ public class QueueToken {
     @Column(nullable = false)
     private LocalDateTime updateAt;
 
-    protected QueueToken() {
-    }
-
-    public QueueToken(String token, UUID userId, int position, LocalDateTime issuedAt, LocalDateTime expiresAt) {
-        this.token = token;
-        this.userId = userId;
-        this.position = position;
-        this.issuedAt = issuedAt;
-        this.expiresAt = expiresAt;
-    }
 
 }
