@@ -1,0 +1,61 @@
+= User API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[user-api]]
+== User API
+
+[[user-get]]
+=== 사용자 조회
+특정 사용자의 정보를 조회합니다.
+
+.요청
+include::{snippets}/get-user-by-id/http-request.adoc[]
+
+.요청 파라미터
+include::{snippets}/get-user-by-id/path-parameters.adoc[]
+
+.응답
+include::{snippets}/get-user-by-id/http-response.adoc[]
+
+.응답 필드
+include::{snippets}/get-user-by-id/response-fields.adoc[]
+
+[[balance-get]]
+=== 잔액 조회
+특정 사용자의 잔액을 조회합니다.
+
+.요청
+include::{snippets}/get-user-balance/http-request.adoc[]
+
+.요청 파라미터
+include::{snippets}/get-user-balance/path-parameters.adoc[]
+
+.응답
+include::{snippets}/get-user-balance/http-response.adoc[]
+
+.응답 필드
+include::{snippets}/get-user-balance/response-fields.adoc[]
+
+[[balance-charge]]
+=== 잔액 충전
+사용자의 잔액을 충전합니다.
+
+.요청
+include::{snippets}/charge-balance/http-request.adoc[]
+
+.요청 파라미터
+include::{snippets}/charge-balance/path-parameters.adoc[]
+
+.요청 필드
+include::{snippets}/charge-balance/request-fields.adoc[]
+
+.응답
+include::{snippets}/charge-balance/http-response.adoc[]
+
+.응답 필드
+include::{snippets}/charge-balance/response-fields.adoc[]
