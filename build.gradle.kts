@@ -40,6 +40,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.projectlombok:lombok:1.18.38")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
@@ -97,5 +98,17 @@ extensions.configure<com.epages.restdocs.apispec.gradle.OpenApi3Extension> {
 	description = "Spring RestDocs를 Redoc문서로 변환한다."
 	version = "0.0.1"
 	format = "yaml"
-	outputDirectory = "src/main/resources/static/docs"
+	outputDirectory = "build/api-spec"
+}
+
+tasks.register<Copy>("copyOpenApiSpec") {
+	dependsOn("openapi3")
+	from("build/api-spec/openapi3.yaml")
+	into("src/main/resources/static/docs")
+}
+
+afterEvaluate {
+	tasks.named("build") {
+		dependsOn("openapi3", "copyOpenApiSpec")
+	}
 }
