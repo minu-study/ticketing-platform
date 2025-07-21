@@ -1,35 +1,26 @@
 package kr.hhplus.be.server.api.user.service;
 
+import kr.hhplus.be.server.api.balanceLog.service.BalanceLogService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.model.ApiResponse;
 import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.balanceLog.dto.BalanceDto;
-import kr.hhplus.be.server.domain.queueToken.entity.QueueToken;
-import kr.hhplus.be.server.domain.queueToken.repository.QueueTokenRepository;
 import kr.hhplus.be.server.domain.user.dto.UserDto;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class Userservice {
+public class UserService {
+
+    private final BalanceLogService balanceLogService;
 
     private final UserRepository userRepository;
-    private final QueueTokenRepository queueTokenRepository;
 
     @Transactional
     public void createUser(UserDto.SetUser.Request param) {
@@ -53,7 +44,7 @@ public class Userservice {
     }
 
     @Transactional
-    public BalanceDto.BalanceView chargeBalance(BalanceDto.ChargeBalance.Request param) {
+    public BalanceDto.ChargeBalance.Response chargeBalance(BalanceDto.ChargeBalance.Request param) {
 
         String token = CommonUtil.getQueueToken();
 
@@ -64,9 +55,15 @@ public class Userservice {
         User user = userRepository.getUser(token);
         user.chargeBalance(param.getAmount());
 
-        return BalanceDto.BalanceView.builder()
+        BalanceDto.BalanceView view = BalanceDto.BalanceView.builder()
                 .userId(user.getId())
                 .balance(user.getBalance())
+                .build();
+
+        balanceLogService.saveChargeLogAsync(user, param.getAmount());
+
+        return BalanceDto.ChargeBalance.Response.builder()
+                .view(view)
                 .build();
     }
 

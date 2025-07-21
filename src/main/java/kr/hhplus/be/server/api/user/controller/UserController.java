@@ -1,21 +1,15 @@
 package kr.hhplus.be.server.api.user.controller;
 
 import jakarta.validation.Valid;
-import kr.hhplus.be.server.api.user.service.Userservice;
+import kr.hhplus.be.server.api.user.service.UserService;
 import kr.hhplus.be.server.common.model.ApiResponse;
 import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.balanceLog.dto.BalanceDto;
 import kr.hhplus.be.server.domain.user.dto.UserDto;
-import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/users")
@@ -23,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class UserController {
 
-    private final Userservice userservice;
+    private final UserService userservice;
 
     // 유저 생성
     @PostMapping
@@ -41,9 +35,13 @@ public class UserController {
         return CommonUtil.convertResponse(response);
     }
 
-
-
-
+    @PostMapping
+    public ResponseEntity<ApiResponse> chargeBalance(@Valid @RequestBody BalanceDto.ChargeBalance.Request param) {
+        log.info("chargeBalance param : {}", param);
+        BalanceDto.ChargeBalance.Response response = userservice.chargeBalance(param);
+        log.info("chargeBalance response : {}", response);
+        return CommonUtil.convertResponse(response);
+    }
 
 
 
