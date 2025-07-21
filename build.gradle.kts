@@ -8,6 +8,8 @@ plugins {
 
 val snippetsDir by extra { file("build/generated-snippets") }
 val asciidoctorExt: Configuration by configurations.creating
+val querydslDir = "src/main/generated"
+
 
 fun getGitHash(): String {
 	return providers.exec {
@@ -37,12 +39,23 @@ dependencyManagement {
 dependencies {
     // Spring
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.projectlombok:lombok:1.18.38")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    // DB
+	// Query-DSL
+	implementation("io.github.openfeign.querydsl:querydsl-core:6.12")
+	implementation("io.github.openfeign.querydsl:querydsl-jpa:6.12")
+
+	annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:6.12:jpa")
+	annotationProcessor("org.projectlombok:lombok:1.18.38")
+	testImplementation("org.projectlombok:lombok:1.18.38")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+
+
+	// DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
 	// Docs
@@ -61,6 +74,22 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<JavaCompile> {
+	options.generatedSourceOutputDirectory.set(file(querydslDir))
+}
+
+tasks.named<Delete>("clean") {
+	delete(file(querydslDir))
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs(querydslDir)
+		}
+	}
 }
 
 tasks.withType<Test> {
