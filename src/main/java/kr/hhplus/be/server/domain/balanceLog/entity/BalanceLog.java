@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.balanceLog.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static kr.hhplus.be.server.common.vo.BalanceActionEnums.CHARGE;
+import static kr.hhplus.be.server.common.vo.BalanceActionEnums.USE;
 
 @Entity
 @NoArgsConstructor
@@ -37,6 +41,18 @@ public class BalanceLog {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    public BalanceLog createCharge(User user, int amount) {
+        this.userId = user.getId();
+        this.amount = amount;
+        this.type = CHARGE.getAction();
+        return this;
+    }
 
+    public BalanceLog createPayment(User user, int amount) {
+        this.userId = user.getId();
+        this.amount = amount;
+        this.type = USE.getAction();
+        return this;
+    }
 
 }
