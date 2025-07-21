@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.common.exception.AppException;
+import kr.hhplus.be.server.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +16,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class User {
@@ -58,7 +60,7 @@ public class User {
     // 잔액 충전 메서드
     public void chargeBalance(int amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("충전 금액은 0보다 커야 합니다.");
+            throw new AppException(ErrorCode.PAYMENT003);
         }
         this.balance += amount;
     }
@@ -66,10 +68,10 @@ public class User {
     // 잔액 사용 메서드
     public void useBalance(int amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("사용 금액은 0보다 커야 합니다.");
+            throw new AppException(ErrorCode.PAYMENT001);
         }
         if (this.balance < amount) {
-            throw new IllegalArgumentException("잔액이 부족합니다.");
+            throw new AppException(ErrorCode.PAYMENT001);
         }
         this.balance -= amount;
     }
