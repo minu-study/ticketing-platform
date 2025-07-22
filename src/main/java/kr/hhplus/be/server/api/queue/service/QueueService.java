@@ -88,38 +88,28 @@ public class QueueService {
 
     /**
      * 토큰 유효성 검증
+     * 아직 대기 순번일때 예외 발생
      */
     @Transactional(readOnly = true)
-    public QueueDto.ValidationResponse validateToken(String token) {
+    public void validateToken(String token) {
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         
         if (queueTokenOptional.isEmpty()) {
-            return QueueDto.ValidationResponse.builder()
-                    .valid(false)
-                    .message("Token not found")
-                    .build();
+            throw new AppException(ErrorCode.AUTH004);
         }
         QueueToken queueToken = queueTokenOptional.get();
 
         if (queueToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return QueueDto.ValidationResponse.builder()
-                    .valid(false)
-                    .userId(queueToken.getUserId())
-                    .status("EXPIRED")
-                    .message("Token expired")
-                    .build();
+            throw new AppException(ErrorCode.AUTH005);
         }
 
         int currentPosition = getCurrentPosition(queueToken);
         String status = determineTokenStatus(queueToken, currentPosition);
-        boolean isActive = "ACTIVE".equals(status);
 
-        return QueueDto.ValidationResponse.builder()
-                .valid(isActive)
-                .userId(queueToken.getUserId())
-                .status(status)
-                .message(isActive ? "Token is valid and active" : "Token is valid but waiting")
-                .build();
+        if (!status.equals(TokenStatusEnums.ACTIVE.getStatus())) {
+            throw new AppException(ErrorCode.QUEUE001);
+        }
+
     }
 
     /**
