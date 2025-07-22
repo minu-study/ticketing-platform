@@ -1,10 +1,8 @@
 package kr.hhplus.be.server.domain.queueToken.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import kr.hhplus.be.server.api.queue.dto.QueueDto;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -16,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
@@ -50,8 +49,32 @@ public class QueueToken {
     @Column(nullable = false)
     private LocalDateTime updateAt;
 
+
+    public QueueToken createToken(UUID userId, int position, String token) {
+        this.userId = userId;
+        this.position = position;
+        this.token = token;
+        this.issuedAt = LocalDateTime.now();
+        this.expiresAt = LocalDateTime.now().plusMinutes(30);
+        return this;
+    }
+
+    public QueueDto.QueueTokenInfoView getTokenInfo() {
+        return QueueDto.QueueTokenInfoView.builder()
+                .token(this.token)
+                .userId(this.userId)
+                .position(this.position)
+                .issuedAt(this.issuedAt)
+                .expiresAt(this.expiresAt)
+                .build();
+    }
+
     public Boolean isExpired() {
         return LocalDateTime.now().isAfter(this.expiresAt);
+    }
+
+    public void setExpireToken() {
+        this.expiresAt = LocalDateTime.now();
     }
 
 
