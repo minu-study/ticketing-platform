@@ -34,6 +34,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public UserDto.GetUser.Response getUser() {
 
         String token = CommonUtil.getQueueToken();
