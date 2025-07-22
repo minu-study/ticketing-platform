@@ -21,7 +21,7 @@ public class SeatService {
     private final SeatRepository seatRepository;
 
     /**
-     * 특정 일정의 예약 가능한 좌석 조회
+     * 특정 이벤트 일정의 좌석 전체 조회
      */
     @Transactional(readOnly = true)
     public SeatDto.getSeats.Response getSeats(SeatDto.getSeats.Request param) {
