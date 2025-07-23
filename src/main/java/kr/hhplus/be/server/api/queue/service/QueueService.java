@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.api.queue.service;
 
-import kr.hhplus.be.server.api.queue.dto.QueueDto;
+import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
 import kr.hhplus.be.server.common.util.CommonUtil;
@@ -8,15 +8,18 @@ import kr.hhplus.be.server.domain.queueToken.entity.QueueToken;
 import kr.hhplus.be.server.domain.queueToken.repository.QueueTokenRepository;
 import kr.hhplus.be.server.domain.queueToken.vo.TokenStatusEnums;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class QueueService {
 
     private final QueueTokenRepository queueTokenRepository;
@@ -25,7 +28,7 @@ public class QueueService {
     private static final int TOKEN_EXPIRY_MINUTES = 30; // 토큰 만료 시간 (분)
     private static final int MAX_ACTIVE_USERS = 20; // 동시 활성 사용자 수
     private static final int ESTIMATED_PROCESSING_TIME_PER_USER = 5; // 사용자당 예상 처리 시간 (분)
-
+    private static final int EXTENSION_MINUTES = 5; // 연장 시간 (분)
 
     @Transactional
     public QueueDto.GetQueueToken.Response issueToken(QueueDto.GetQueueToken.Request param) {
@@ -121,6 +124,86 @@ public class QueueService {
         queueTokenOptional.ifPresent(queueToken -> queueToken.setExpiresAt(LocalDateTime.now()));
     }
 
+    /**
+     * 토큰 만료 시간 연장 (결제 과정에서 호출)
+     * 최대 3회까지만 연장 가능
+     */
+    @Transactional
+    public Boolean extendToken() {
+
+        String token = CommonUtil.getQueueToken();
+
+        Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
+        
+        if (queueTokenOptional.isEmpty()) {
+            return Boolean.FALSE;
+        }
+        QueueToken queueToken = queueTokenOptional.get();
+
+        // 토큰이 이미 만료시간을 넘겼다면 X
+        if (queueToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            return Boolean.FALSE;
+        }
+
+        // 토큰이 현재 활성상태가 아니라면 X
+        int currentPosition = getCurrentPosition(queueToken);
+        String status = determineTokenStatus(queueToken, currentPosition);
+        if (!status.equals(TokenStatusEnums.ACTIVE.getStatus())) {
+            return Boolean.FALSE;
+        }
+
+        // 만료시간 * 3 이 최대 연장된 시간이고 이걸 넘겼다면 발행 X
+        int maxAllowedExpiryMinutes = EXTENSION_MINUTES * 3;
+        LocalDateTime maxAllowedExpiry = queueToken.getIssuedAt().plusMinutes(maxAllowedExpiryMinutes);
+        LocalDateTime newExpiry = queueToken.getExpiresAt().plusMinutes(EXTENSION_MINUTES);
+        
+        if (newExpiry.isAfter(maxAllowedExpiry)) {
+            return Boolean.FALSE;
+        }
+        
+        queueToken.setExpiresAt(newExpiry);
+        queueTokenRepository.save(queueToken);
+        
+        return true;
+    }
+
+
+    @Transactional
+    public void cleanupExpiredTokens(LocalDateTime now) {
+
+        try {
+            List<QueueToken> expiredTokens = queueTokenRepository.findByExpiresAtBefore(now);
+            if (!expiredTokens.isEmpty()) {
+                queueTokenRepository.deleteAll(expiredTokens);
+            }
+        } catch (Exception e) {
+            log.error("cleanupExpiredTokens_failed to process error : {}", e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void reorderTokens(LocalDateTime now) {
+        try {
+
+            List<QueueToken> activeTokens = queueTokenRepository.findByExpiresAtAfterOrderByIssuedAt(now);
+
+            if (!activeTokens.isEmpty()) {
+
+                for (int i = 0; i < activeTokens.size(); i++) {
+                    QueueToken token = activeTokens.get(i);
+                    int newPosition = i + 1;
+
+                    if (token.getPosition() != newPosition) {
+                        token.setPosition(newPosition);
+                        queueTokenRepository.save(token);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("reorderTokens_failed to process error : {}", e.getMessage());
+        }
+    }
 
     private String generateToken() {
         return UUID.randomUUID().toString();
