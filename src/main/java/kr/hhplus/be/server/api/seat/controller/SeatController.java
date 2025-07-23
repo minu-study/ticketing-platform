@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.api.seat.controller;
 
 import jakarta.validation.Valid;
-import kr.hhplus.be.server.api.event.dto.EventDto;
 import kr.hhplus.be.server.api.seat.service.SeatService;
 import kr.hhplus.be.server.common.model.ApiResponse;
 import kr.hhplus.be.server.common.util.CommonUtil;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,7 +24,7 @@ public class SeatController {
      * 이벤트 스케줄 식별자를 통해 해당 식별자에 묶인 좌석들을 조회
      * 좌석별 상태(예약 가능, 예약 불가)를 함께 제공
      */
-    @GetMapping("/schedules")
+    @GetMapping
     public ResponseEntity<ApiResponse> getSeats(@Valid SeatDto.getSeats.Request param) {
         log.info("getAvailableSeats param : {}", param);
         SeatDto.getSeats.Response response = seatService.getSeats(param);
