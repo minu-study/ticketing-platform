@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.vo;
+package kr.hhplus.be.server.domain.balanceLog.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

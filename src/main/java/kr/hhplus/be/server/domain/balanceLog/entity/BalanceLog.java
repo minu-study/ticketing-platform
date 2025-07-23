@@ -12,8 +12,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.hhplus.be.server.common.vo.BalanceActionEnums.CHARGE;
-import static kr.hhplus.be.server.common.vo.BalanceActionEnums.USE;
+import static kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums.CHARGE;
+import static kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums.USE;
 
 @Entity
 @NoArgsConstructor
