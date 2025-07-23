@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api.queue.dto;
+package kr.hhplus.be.server.domain.queueToken.dto;
 
 import lombok.*;
 

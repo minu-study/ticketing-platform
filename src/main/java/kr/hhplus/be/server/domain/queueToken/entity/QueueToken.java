@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.queueToken.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.api.queue.dto.QueueDto;
+import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
