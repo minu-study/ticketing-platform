@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api.event.dto;
+package kr.hhplus.be.server.domain.event.dto;
 
 import lombok.*;
 

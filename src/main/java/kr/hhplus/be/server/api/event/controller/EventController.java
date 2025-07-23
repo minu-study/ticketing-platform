@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.api.event.controller;
 
-import kr.hhplus.be.server.api.event.dto.EventDto;
+import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.api.event.service.EventService;
 import kr.hhplus.be.server.common.model.ApiResponse;
 import kr.hhplus.be.server.common.util.CommonUtil;
@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController

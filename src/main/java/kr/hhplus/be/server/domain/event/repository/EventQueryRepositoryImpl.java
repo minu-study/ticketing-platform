@@ -6,7 +6,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.hhplus.be.server.api.event.dto.EventDto;
+import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.domain.seat.entity.QSeat;
 import kr.hhplus.be.server.domain.seat.vo.SeatStatusEnums;
 import lombok.RequiredArgsConstructor;
