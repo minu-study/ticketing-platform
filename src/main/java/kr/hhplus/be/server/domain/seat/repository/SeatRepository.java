@@ -5,11 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long>, SeatQueryRepository {
 
-    int countByScheduleId(Long scheduleId);
-    int countByScheduleIdAndStatus(Long scheduleId, String status);
-    int countByScheduleIdAndStatusAndHoldExpiresAtAfter(Long scheduleId, String status, LocalDateTime holdExpiresAt);
+    List<Seat> findByStatusAndHoldExpiresAtBefore(String status, LocalDateTime holdExpiresAt);
 }
