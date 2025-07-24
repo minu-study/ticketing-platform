@@ -41,17 +41,10 @@ public class BalanceLog {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public BalanceLog createCharge(User user, int amount) {
+    public BalanceLog saveLog(User user, int amount, String type) {
         this.userId = user.getId();
         this.amount = amount;
-        this.type = CHARGE.getAction();
-        return this;
-    }
-
-    public BalanceLog createPayment(User user, int amount) {
-        this.userId = user.getId();
-        this.amount = amount;
-        this.type = USE.getAction();
+        this.type = type;
         return this;
     }
 
