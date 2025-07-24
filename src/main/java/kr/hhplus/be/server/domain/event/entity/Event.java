@@ -3,7 +3,9 @@ package kr.hhplus.be.server.domain.event.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "event")
@@ -50,4 +54,7 @@ public class Event {
     private List<EventSchedule> schedules = new ArrayList<>();
 
 
+    public Boolean isEnable() {
+        return this.enable;
+    }
 }

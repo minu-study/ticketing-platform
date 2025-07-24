@@ -3,7 +3,9 @@ package kr.hhplus.be.server.domain.seat.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @DynamicUpdate
 @AllArgsConstructor
 @NoArgsConstructor

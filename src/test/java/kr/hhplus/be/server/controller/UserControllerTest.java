@@ -55,11 +55,11 @@ class UserControllerTest {
                 .apply(documentationConfiguration(restDocumentation))
                 .build();
 
-        userController.users.clear();  // 기존 데이터 삭제
-        userController.users.put(
-                testUserId,
-                new User(testUserId, "정민우1", 100000, LocalDateTime.now(), LocalDateTime.now())
-        );
+//        userController.users.clear();  // 기존 데이터 삭제
+//        userController.users.put(
+//                testUserId,
+//                new User(testUserId, "정민우1", 100000, LocalDateTime.now(), LocalDateTime.now())
+//        );
 
     }
 
