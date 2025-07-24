@@ -2,6 +2,7 @@ package kr.hhplus.be.server.api.balanceLog.service;
 
 import kr.hhplus.be.server.domain.balanceLog.entity.BalanceLog;
 import kr.hhplus.be.server.domain.balanceLog.repository.BalanceLogRepository;
+import kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums;
 import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class BalanceLogService {
     public void saveChargeLogAsync(User user, int amount) {
 
         try {
-            BalanceLog balanceLog = new BalanceLog().createCharge(user, amount);
+            BalanceLog balanceLog = new BalanceLog().saveLog(user, amount, BalanceActionEnums.CHARGE.getAction());
             balanceLogRepository.save(balanceLog);
         } catch (Exception e) {
             log.error("saveChargeLogAsync error : {}", e.getMessage());
@@ -30,10 +31,20 @@ public class BalanceLogService {
     @Async
     public void savePaymentLogAsync(User user, int amount) {
         try {
-            BalanceLog balanceLog = new BalanceLog().createPayment(user, amount);
+            BalanceLog balanceLog = new BalanceLog().saveLog(user, amount, BalanceActionEnums.REFUND.getAction());
             balanceLogRepository.save(balanceLog);
         } catch (Exception e) {
             log.error("savePaymentLogAsync error : {}", e.getMessage());
+        }
+    }
+
+    @Async
+    public void savePaymentRefundLogAsync(User user, int amount) {
+        try {
+            BalanceLog balanceLog = new BalanceLog().saveLog(user, amount, BalanceActionEnums.REFUND.getAction());
+            balanceLogRepository.save(balanceLog);
+        } catch (Exception e) {
+            log.error("savePaymentRefundLogAsync error : {}", e.getMessage());
         }
     }
 
