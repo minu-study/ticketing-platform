@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum BalanceActionEnums{
 
     CHARGE("CHARGE"),
+    REFUND("REFUND"),
     USE("USE");
 
     private final String action;
