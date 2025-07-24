@@ -34,6 +34,16 @@ public class QueueDto {
         private LocalDateTime expiresAt;
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class QueueTokenValidationView {
+        private String token;
+        private UUID userId;
+    }
+
     public static class GetQueueToken {
 
         @Getter

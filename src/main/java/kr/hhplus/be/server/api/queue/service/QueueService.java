@@ -94,7 +94,8 @@ public class QueueService {
      * 아직 대기 순번일때 예외 발생
      */
     @Transactional(readOnly = true)
-    public void validateToken(String token) {
+    public QueueDto.QueueTokenValidationView validateToken(String token) {
+
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         
         if (queueTokenOptional.isEmpty()) {
@@ -106,13 +107,18 @@ public class QueueService {
             throw new AppException(ErrorCode.AUTH005);
         }
 
-        int currentPosition = getCurrentPosition(queueToken);
-        String status = determineTokenStatus(queueToken, currentPosition);
+        // FIXME: 인증토큰을 겸하기 때문에 대기열 상태 여부에 따라 예외 발생시키면 안됨..설계 미스
+//        int currentPosition = getCurrentPosition(queueToken);
+//        String status = determineTokenStatus(queueToken, currentPosition);
+//
+//        if (!status.equals(TokenStatusEnums.ACTIVE.getStatus())) {
+//            throw new AppException(ErrorCode.QUEUE001);
+//        }
 
-        if (!status.equals(TokenStatusEnums.ACTIVE.getStatus())) {
-            throw new AppException(ErrorCode.QUEUE001);
-        }
-
+        return QueueDto.QueueTokenValidationView.builder()
+                .token(queueToken.getToken())
+                .userId(queueToken.getUserId())
+                .build();
     }
 
     /**
