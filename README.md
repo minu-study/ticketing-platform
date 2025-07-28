@@ -8,6 +8,7 @@
 - [클래스 다이어그램](#클래스-다이어그램)
 - [ERD](#erd)
 - [시퀀스 다이어그램](#시퀀스-다이어그램)
+- [아키텍처 패턴 및 레이어별 책임](#아키텍처-패턴-및-레이어별-책임)
 
 
 ## 요구사항 분석
@@ -409,3 +410,123 @@ sequenceDiagram
     PaymentService->>QueueTokenRepository: 토큰 만료 처리(결제 완료 후)
     PaymentService-->>User: 결제 결과 및 상태 반환
 ```
+
+## 아키텍처 패턴 및 레이어별 책임
+
+### 선택한 아키텍처 패턴: Layered Architecture (계층형 아키텍처)
+
+### 레이어별 책임 정의
+
+#### 1. Presentation Layer (API Layer)
+**위치**: `src/main/java/kr/hhplus/be/server/api/*/controller`
+
+**책임**:
+- HTTP 요청/응답 처리
+- 요청 데이터 검증 및 변환
+- 응답 데이터 포맷팅
+- 예외 처리 및 에러 응답 생성
+
+**주요 구성요소**:
+- `*Controller` 클래스들
+- `ApiResponse` 공통 응답 모델
+
+**제약사항**:
+- 비즈니스 로직을 포함하지 않음
+- 데이터베이스에 직접 접근하지 않음
+- Application Layer의 Service만 의존
+
+#### 2. Application Layer (Service Layer)
+**위치**: `src/main/java/kr/hhplus/be/server/api/*/service`
+
+**책임**:
+- 비즈니스 유스케이스 구현
+- 트랜잭션 관리
+- 도메인 객체 간의 협력 조정
+- 외부 시스템과의 통합
+- 보안 및 인증 처리
+
+**주요 구성요소**:
+- `QueueService`: 대기열 토큰 관리
+- `EventService`: 이벤트 및 스케줄 조회
+- `SeatService`: 좌석 정보 관리
+- `ReservationService`: 예약 생성, 취소, 확정
+- `UserService`: 사용자 및 잔액 관리
+- `PaymentService`: 결제 처리
+- `BalanceLogService`: 잔액 이력 관리
+
+**제약사항**:
+- UI/웹 관련 로직을 포함하지 않음
+- 데이터베이스 스키마에 직접 의존하지 않음
+- Domain Layer의 Repository 인터페이스만 의존
+
+#### 3. Domain Layer
+**위치**: `src/main/java/kr/hhplus/be/server/domain`
+
+**책임**:
+- 핵심 비즈니스 규칙 및 로직 구현
+- 도메인 모델 정의
+- 데이터 접근 인터페이스 정의
+- 비즈니스 불변식 보장
+
+**주요 구성요소**:
+
+**3-1. Entities** (`domain/*/entity`)
+- `User`: 사용자 정보 및 잔액 관리
+- `QueueToken`: 대기열 토큰 정보
+- `Event`, `EventSchedule`: 이벤트 및 일정 정보
+- `Seat`: 좌석 정보 및 상태 관리
+- `Reservation`: 예약 정보 및 상태 관리
+- `Payment`: 결제 정보
+- `BalanceLog`: 잔액 변동 이력
+
+**3-2. Value Objects** (`domain/*/vo`)
+- `TokenStatusEnums`: 토큰 상태 정의
+- `SeatStatusEnums`: 좌석 상태 정의
+- `ReservationStatusEnums`: 예약 상태 정의
+- `PaymentStatusEnums`: 결제 상태 정의
+- `BalanceActionEnums`: 잔액 변동 유형 정의
+
+**3-3. DTOs** (`domain/*/dto`)
+- 레이어 간 데이터 전송을 위한 객체들
+- 요청/응답 모델 정의
+
+**3-4. Repository Interfaces** (`domain/*/repository`)
+- 데이터 접근 계약 정의
+- 도메인 중심의 쿼리 메서드 정의
+
+**제약사항**:
+- 외부 프레임워크에 의존하지 않음
+- 상위 레이어를 참조하지 않음
+- 순수한 비즈니스 로직만 포함
+
+#### 4. Infrastructure Layer
+**위치**: `src/main/java/kr/hhplus/be/server`
+
+**책임**:
+- 외부 시스템과의 연동
+- 데이터베이스 구현체 제공
+- 설정 및 구성 관리
+- 기술적 관심사 처리
+
+**주요 구성요소**:
+
+**4-1. Repository Implementations** (`domain/*/repository/*Impl`)
+- JPA/QueryDSL을 이용한 데이터 접근 구현
+- 복잡한 쿼리 로직 구현
+
+**4-2. Configuration** (`config/`)
+- `JpaConfig`: JPA 설정
+- `QuerydslConfig`: QueryDSL 설정
+
+**4-3. Common Components** (`common/`)
+- `CommonUtil`: 공통 유틸리티
+- `AppException`, `ErrorCode`: 예외 처리
+- `ApiResponse`: 공통 응답 모델
+
+**4-4. Scheduler** (`scheduler/`)
+- `TokenAndReservationScheduler`: 토큰 및 예약 만료 처리
+
+**제약사항**:
+- 비즈니스 로직을 포함하지 않음
+- Domain Layer의 인터페이스를 구현
+- 기술적 세부사항만 담당

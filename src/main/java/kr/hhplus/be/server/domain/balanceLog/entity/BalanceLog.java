@@ -1,13 +1,25 @@
 package kr.hhplus.be.server.domain.balanceLog.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.domain.user.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums.CHARGE;
+import static kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums.USE;
+
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "balance_log")
 public class BalanceLog {
@@ -29,15 +41,11 @@ public class BalanceLog {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public BalanceLog() {
-    }
-
-    private BalanceLog(UUID userId, int amount, String type) {
-        this.userId = userId;
+    public BalanceLog saveLog(User user, int amount, String type) {
+        this.userId = user.getId();
         this.amount = amount;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
+        return this;
     }
-
 
 }

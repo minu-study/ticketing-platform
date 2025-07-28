@@ -23,6 +23,13 @@ public class BalanceDto {
             private int amount;
         }
 
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @Getter
+        public static class Response {
+            private BalanceView view;
+        }
 
     }
 

@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.common.exception.AppException;
+import kr.hhplus.be.server.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +16,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class User {
@@ -31,6 +33,9 @@ public class User {
     private String userName;
 
     @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
     private int balance;
 
     @CreatedDate
@@ -40,5 +45,36 @@ public class User {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updateAt;
+
+
+    // 정적 팩토리 메서드 - 새로운 User 생성
+    public static User createUser(String userName, String email) {
+        User user = new User();
+        user.id = UUID.randomUUID();
+        user.userName = userName;
+        user.email = email;
+        user.balance = 0;
+        return user;
+    }
+
+    // 잔액 충전 메서드
+    public void chargeBalance(int amount) {
+        if (amount <= 0) {
+            throw new AppException(ErrorCode.PAYMENT003);
+        }
+        this.balance += amount;
+    }
+
+    // 잔액 사용 메서드
+    public void useBalance(int amount) {
+        if (amount <= 0) {
+            throw new AppException(ErrorCode.PAYMENT001);
+        }
+        if (this.balance < amount) {
+            throw new AppException(ErrorCode.PAYMENT001);
+        }
+        this.balance -= amount;
+    }
+
 
 }
