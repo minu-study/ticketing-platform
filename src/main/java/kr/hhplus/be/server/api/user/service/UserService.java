@@ -5,6 +5,7 @@ import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
 import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.balanceLog.dto.BalanceDto;
+import kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums;
 import kr.hhplus.be.server.domain.user.dto.UserDto;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
@@ -61,7 +62,7 @@ public class UserService {
                 .balance(user.getBalance())
                 .build();
 
-        balanceLogService.saveChargeLogAsync(user, param.getAmount());
+        balanceLogService.saveLogAsync(user.getId(), param.getAmount(), BalanceActionEnums.CHARGE.getAction());
 
         return BalanceDto.ChargeBalance.Response.builder()
                 .view(view)

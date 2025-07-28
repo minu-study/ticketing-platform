@@ -6,6 +6,7 @@ import kr.hhplus.be.server.api.reservation.service.ReservationService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
 import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums;
 import kr.hhplus.be.server.domain.payment.dto.PaymentDto;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
@@ -106,7 +107,7 @@ public class PaymentService {
             queueService.expireToken(token);
 
             // 결제 로깅
-            balanceLogService.savePaymentLogAsync(user, paymentAmount);
+            balanceLogService.saveLogAsync(user.getId(), paymentAmount, BalanceActionEnums.USE.getAction());
 
         } catch (Exception e) {
             log.error("Payment processing failed for reservation: {}", param.getReservationId(), e);
@@ -157,7 +158,7 @@ public class PaymentService {
             user.chargeBalance(payment.getAmount());
             userRepository.save(user);
 
-            balanceLogService.savePaymentRefundLogAsync(user, payment.getAmount());
+            balanceLogService.saveLogAsync(user.getId(), payment.getAmount(), BalanceActionEnums.REFUND.getAction());
 
         }
 
