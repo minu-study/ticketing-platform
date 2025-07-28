@@ -42,7 +42,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.projectlombok:lombok:1.18.38")
+	implementation("org.projectlombok:lombok")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 
 	// Query-DSL
@@ -50,9 +50,9 @@ dependencies {
 	implementation("io.github.openfeign.querydsl:querydsl-jpa:6.12")
 
 	annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:6.12:jpa")
-	annotationProcessor("org.projectlombok:lombok:1.18.38")
-	testImplementation("org.projectlombok:lombok:1.18.38")
-	testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
+	annotationProcessor("org.projectlombok:lombok")
+	testImplementation("org.projectlombok:lombok")
+	testAnnotationProcessor("org.projectlombok:lombok")
 
 
 	// DB
