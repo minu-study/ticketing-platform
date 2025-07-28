@@ -141,12 +141,12 @@ class ReservationServiceTest {
             mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH004));
+                    .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository, never()).findById(any());
@@ -177,7 +177,7 @@ class ReservationServiceTest {
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DB001.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DATA_NOT_FOUND.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository).findById(testSeatId);
@@ -211,7 +211,7 @@ class ReservationServiceTest {
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RESERVATION001.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository).findById(testSeatId);

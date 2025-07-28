@@ -133,7 +133,7 @@ class QueueServiceTest {
             // When & Then
             assertThatThrownBy(() -> queueService.getQueuePosition())
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
         }
     }
 
@@ -160,7 +160,7 @@ class QueueServiceTest {
             // When & Then
             assertThatThrownBy(() -> queueService.getQueuePosition())
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH005.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXPIRED_TOKEN.getCode());
         }
     }
 
@@ -192,7 +192,7 @@ class QueueServiceTest {
         // When & Then
         assertThatThrownBy(() -> queueService.validateToken(testToken))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
     }
 
     @Test
@@ -215,7 +215,7 @@ class QueueServiceTest {
         // When & Then
         assertThatThrownBy(() -> queueService.validateToken(testToken))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH005.getCode());
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXPIRED_TOKEN.getCode());
     }
 
     @Test

@@ -48,12 +48,12 @@ public class ReservationService {
         Seat seat = seatRepository.findById(param.getSeatId())
                 .orElseThrow(() -> {
                     log.error("Seat not found for seatId: {}", param.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         if (!isAvailableForReservationSeat(seat)) {
             log.error("Seat is not available for reservation: {}", param.getSeatId());
-            throw new AppException(ErrorCode.RESERVATION001);
+            throw new AppException(ErrorCode.SEAT_NOT_AVAILABLE);
         }
 
         // 임시 예약 생성
@@ -114,13 +114,13 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(param.getReservationId())
                 .orElseThrow(() ->  {
                     log.error("reservation not found for reservationId: {}", param.getReservationId());
-                    throw new AppException(ErrorCode.DB001);
+                    throw new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         // 취소 가능한 상태인지 확인
         if (Boolean.TRUE.equals(isCancelAvailableForReservation(reservation))) {
             log.error("cancelReservation, reservation is not cancel available for reservationId: {}", param.getReservationId());
-            throw new AppException(ErrorCode.PAYMENT008);
+            throw new AppException(ErrorCode.RESERVATION_CANNOT_BE_CANCELED);
         }
 
         reservation.setStatus(ReservationStatusEnums.CANCELED.getStatus());
@@ -146,7 +146,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() ->  {
                     log.error("Reservation not found for reservationId: {}", reservationId);
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         reservation.setStatus(ReservationStatusEnums.CONFIRMED.getStatus());
@@ -156,7 +156,7 @@ public class ReservationService {
         Seat seat = seatRepository.findById(reservation.getSeatId())
                 .orElseThrow(() ->  {
                     log.error("Seat not found for seatId: {}", reservation.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
         seat.setStatus(SeatStatusEnums.RESERVED.getStatus());
         seat.setHoldExpiresAt(null);
@@ -199,7 +199,7 @@ public class ReservationService {
             EventSchedule eventSchedule = eventScheduleRepository.findById(reservation.getScheduleId())
                     .orElseThrow(() -> {
                         log.error("isCancelAvailableForReservation_EventSchedule not found for scheduleId: {}", reservation.getScheduleId());
-                        return new AppException(ErrorCode.DB001);
+                        return new AppException(ErrorCode.DATA_NOT_FOUND);
                     });
 
             LocalDateTime cancelDeadline = eventSchedule.getStartDateTime().minusDays(1);

@@ -28,7 +28,7 @@ public class UserService {
 
         Boolean existedUser = userRepository.existsByEmail(param.getEmail());
         if (Boolean.TRUE.equals(existedUser)) {
-            throw new AppException(ErrorCode.AUTH002);
+            throw new AppException(ErrorCode.DUPLICATE_ACCOUNT);
         }
 
         User user = User.createUser(param.getUserName(), param.getEmail());
@@ -51,7 +51,7 @@ public class UserService {
         String token = CommonUtil.getQueueToken();
 
         if (param.getAmount() <= 0) {
-            throw new AppException(ErrorCode.PAYMENT003);
+            throw new AppException(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
 
         User user = userRepository.getUser(token);

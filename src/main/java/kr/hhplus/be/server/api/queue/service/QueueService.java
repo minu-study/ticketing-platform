@@ -63,12 +63,12 @@ public class QueueService {
 
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         if (queueTokenOptional.isEmpty()) {
-            throw new AppException(ErrorCode.AUTH004);
+            throw new AppException(ErrorCode.INVALID_TOKEN);
         }
         QueueToken queueToken = queueTokenOptional.get();
 
         if (queueToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.AUTH005);
+            throw new AppException(ErrorCode.EXPIRED_TOKEN);
         }
 
         int currentPosition = getCurrentPosition(queueToken);
@@ -99,12 +99,12 @@ public class QueueService {
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         
         if (queueTokenOptional.isEmpty()) {
-            throw new AppException(ErrorCode.AUTH004);
+            throw new AppException(ErrorCode.INVALID_TOKEN);
         }
         QueueToken queueToken = queueTokenOptional.get();
 
         if (queueToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.AUTH005);
+            throw new AppException(ErrorCode.EXPIRED_TOKEN);
         }
 
         // FIXME: 인증토큰을 겸하기 때문에 대기열 상태 여부에 따라 예외 발생시키면 안됨..설계 미스

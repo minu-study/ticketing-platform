@@ -112,12 +112,12 @@ class EventServiceTest {
             mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH004));
+                    .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> eventService.getEventList(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(eventRepository, never()).getEventList(any());
@@ -201,12 +201,12 @@ class EventServiceTest {
             mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH005));
+                    .thenThrow(new AppException(ErrorCode.EXPIRED_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> eventService.getAvailableEventSchedules(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH005.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXPIRED_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(eventRepository, never()).getEventScheduleInfo(any(), any());

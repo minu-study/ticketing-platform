@@ -60,7 +60,7 @@ public class User {
     // 잔액 충전 메서드
     public void chargeBalance(int amount) {
         if (amount <= 0) {
-            throw new AppException(ErrorCode.PAYMENT003);
+            throw new AppException(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
         this.balance += amount;
     }
@@ -68,10 +68,10 @@ public class User {
     // 잔액 사용 메서드
     public void useBalance(int amount) {
         if (amount <= 0) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
         if (this.balance < amount) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
         this.balance -= amount;
     }

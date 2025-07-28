@@ -120,12 +120,12 @@ class SeatServiceTest {
             mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH004));
+                    .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> seatService.getSeats(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository, never()).getSeats(any(), any());

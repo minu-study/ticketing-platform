@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.hhplus.be.server.domain.payment.entity.QPayment.payment;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -61,18 +59,18 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(param.getReservationId())
                 .orElseThrow(() ->  {
                     log.error("Reservation not found for reservationId: {}", param.getReservationId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         // Temp 상태 예약이 아니거나 예약이 만료된 경우 결제 안됨
         if (!ReservationStatusEnums.TEMP.getStatus().equals(reservation.getStatus()) || reservation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.PAYMENT005);
+            throw new AppException(ErrorCode.INVALID_RESERVATION_STATUS_FOR_PAYMENT);
         }
 
         Seat seat = seatRepository.findById(reservation.getSeatId())
                 .orElseThrow(() ->  {
                     log.error("Seat not found for seatId: {}", reservation.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         int paymentAmount = SeatTypeAndValueEnums.valueOf(seat.getSeatType()).getValue();
@@ -80,11 +78,11 @@ public class PaymentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  {
                     log.error("User not found for userId: {}", userId);
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         if (user.getBalance() < paymentAmount) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
 
         Payment payment = Payment.create(userId, param.getReservationId(), paymentAmount);
@@ -112,7 +110,7 @@ public class PaymentService {
         } catch (Exception e) {
             log.error("Payment processing failed for reservation: {}", param.getReservationId(), e);
             updateFailPayment(payment);
-            throw new AppException(ErrorCode.PAYMENT007);
+            throw new AppException(ErrorCode.PAYMENT_PROCESSING_ERROR);
         }
 
     }
@@ -152,7 +150,7 @@ public class PaymentService {
             User user = userRepository.findById(reservation.getUserId())
                     .orElseThrow(() -> {
                         log.error("User not found for userId: {}", reservation.getUserId());
-                        return new AppException(ErrorCode.DB001);
+                        return new AppException(ErrorCode.DATA_NOT_FOUND);
                     });
 
             user.chargeBalance(payment.getAmount());

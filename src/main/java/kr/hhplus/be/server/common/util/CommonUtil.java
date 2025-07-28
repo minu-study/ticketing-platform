@@ -38,7 +38,7 @@ public class CommonUtil {
             return token;
         } else {
             log.error("Auth-Queue-Token header is empty.");
-            throw new AppException(ErrorCode.AUTH003);
+            throw new AppException(ErrorCode.NOT_FOUND_TOKEN);
         }
 
     }
