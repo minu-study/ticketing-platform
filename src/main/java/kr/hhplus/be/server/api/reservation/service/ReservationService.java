@@ -127,13 +127,13 @@ public class ReservationService {
         reservation.setCanceledAt(LocalDateTime.now());
         reservationRepository.save(reservation);
 
-        Optional<Seat> seatOptional = seatRepository.findById(reservation.getSeatId());
-        if (seatOptional.isPresent()) {
-            Seat seat = seatOptional.get();
-            seat.setStatus(SeatStatusEnums.AVAILABLE.getStatus());
-            seat.setHoldExpiresAt(null);
-            seatRepository.save(seat);
-        }
+        seatRepository.findById(reservation.getSeatId()).ifPresent(
+                seat -> {
+                    seat.setStatus(SeatStatusEnums.AVAILABLE.getStatus());
+                    seat.setHoldExpiresAt(null);
+                    seatRepository.save(seat);
+                }
+        );
 
         paymentService.paymentRefund(reservation);
     }
