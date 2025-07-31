@@ -3,7 +3,6 @@ package kr.hhplus.be.server.api.seat.service;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.seat.dto.SeatDto;
 import kr.hhplus.be.server.domain.seat.entity.Seat;

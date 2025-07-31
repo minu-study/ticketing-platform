@@ -5,7 +5,7 @@ import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.api.reservation.service.ReservationService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums;
 import kr.hhplus.be.server.domain.payment.dto.PaymentDto;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
@@ -50,7 +50,7 @@ public class PaymentService {
     @Transactional
     public void processPayment(PaymentDto.SetPayment.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
         UUID userId = tokenInfo.getUserId();
 
@@ -121,7 +121,7 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public PaymentDto.GetPayment.Response getPayment(PaymentDto.GetPayment.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         List<PaymentDto.PaymentView> list = paymentRepository.getPaymentList(param.getUserId());

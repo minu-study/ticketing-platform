@@ -3,7 +3,7 @@ package kr.hhplus.be.server.api.seat.controller;
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.api.seat.service.SeatService;
 import kr.hhplus.be.server.common.model.ApiResponse;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.ResponseUtil;
 import kr.hhplus.be.server.domain.seat.dto.SeatDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class SeatController {
         log.info("getAvailableSeats param : {}", param);
         SeatDto.getSeats.Response response = seatService.getSeats(param);
         log.info("getAvailableSeats response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
 }

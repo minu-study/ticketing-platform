@@ -3,7 +3,6 @@ package kr.hhplus.be.server.api.event.service;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.domain.event.repository.EventRepository;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;

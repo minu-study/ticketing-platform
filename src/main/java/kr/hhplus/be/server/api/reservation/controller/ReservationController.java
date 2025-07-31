@@ -1,15 +1,13 @@
 package kr.hhplus.be.server.api.reservation.controller;
 
 import kr.hhplus.be.server.common.model.ApiResponse;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.ResponseUtil;
 import kr.hhplus.be.server.domain.reservation.dto.ReservationDto;
 import kr.hhplus.be.server.api.reservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservation")
@@ -27,7 +25,7 @@ public class ReservationController {
         log.info("createReservation param : {}", param);
         ReservationDto.SetReservation.Response response = reservationService.createReservation(param);
         log.info("createReservation response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -36,7 +34,7 @@ public class ReservationController {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse> getReservationList() {
         ReservationDto.GetReservationList.Response response = reservationService.getReservationList();
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -47,7 +45,7 @@ public class ReservationController {
         log.info("getReservation param : {}", param);
         ReservationDto.GetReservation.Response response = reservationService.getReservation(param);
         log.info("getReservation response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -57,6 +55,6 @@ public class ReservationController {
     public ResponseEntity<ApiResponse> cancelReservation(@RequestBody ReservationDto.CancelReservation.Request param) {
         log.info("cancelReservation param : {}", param);
         reservationService.cancelReservation(param);
-        return CommonUtil.convertResponse();
+        return ResponseUtil.convertResponse();
     }
 }

@@ -2,7 +2,6 @@ package kr.hhplus.be.server.api.queue.service;
 
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.queueToken.entity.QueueToken;
 import kr.hhplus.be.server.domain.queueToken.repository.QueueTokenRepository;

@@ -4,7 +4,7 @@ import kr.hhplus.be.server.api.payment.service.PaymentService;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.reservation.dto.ReservationDto;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +41,7 @@ public class ReservationService {
     @Transactional
     public ReservationDto.SetReservation.Response createReservation(ReservationDto.SetReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
 
         Seat seat = seatRepository.findById(param.getSeatId())
@@ -82,7 +81,7 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationDto.GetReservationList.Response getReservationList() {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
 
         List<ReservationDto.ReservationSummaryView> list = reservationRepository.getReservationList(tokenInfo.getUserId());
@@ -95,7 +94,7 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationDto.GetReservation.Response getReservation(ReservationDto.GetReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         ReservationDto.ReservationDetailView view = reservationRepository.getReservationDetail(param.getReservationId());
@@ -108,7 +107,7 @@ public class ReservationService {
     @Transactional
     public void cancelReservation(ReservationDto.CancelReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         Reservation reservation = reservationRepository.findById(param.getReservationId())

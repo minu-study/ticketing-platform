@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.api.queue.service;
 
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.queueToken.entity.QueueToken;
 import kr.hhplus.be.server.domain.queueToken.repository.QueueTokenRepository;
 import kr.hhplus.be.server.domain.queueToken.vo.TokenStatusEnums;
@@ -59,7 +59,7 @@ public class QueueService {
     @Transactional(readOnly = true)
     public QueueDto.GetQueuePosition.Response getQueuePosition() {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
 
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         if (queueTokenOptional.isEmpty()) {
@@ -137,7 +137,7 @@ public class QueueService {
     @Transactional
     public Boolean extendToken() {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
 
         Optional<QueueToken> queueTokenOptional = queueTokenRepository.findByToken(token);
         
