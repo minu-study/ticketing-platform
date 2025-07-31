@@ -3,10 +3,7 @@ package kr.hhplus.be.server.domain.user.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
