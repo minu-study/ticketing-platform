@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.api.event.service;
 
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.api.queue.service.QueueService;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import kr.hhplus.be.server.domain.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class EventService {
     @Transactional(readOnly = true)
     public EventDto.GetEventList.Response getEventList(EventDto.GetEventList.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         List<EventDto.EventSummaryView> list = eventRepository.getEventList(param.getCategoryId());
@@ -36,7 +36,7 @@ public class EventService {
     @Transactional(readOnly = true)
     public EventDto.GetEventScheduleList.Response getAvailableEventSchedules(EventDto.GetEventScheduleList.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         List<EventDto.GetEventScheduleInfoView> list = eventRepository.getEventScheduleInfo(param.getEventId(), LocalDateTime.now());

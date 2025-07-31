@@ -2,7 +2,7 @@ package kr.hhplus.be.server.api.queue.service;
 
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.queueToken.entity.QueueToken;
 import kr.hhplus.be.server.domain.queueToken.repository.QueueTokenRepository;
@@ -99,8 +99,8 @@ class QueueServiceTest {
     void getQueuePosition_success() {
 
         // Given
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueTokenRepository.findByToken(testToken))
                     .thenReturn(Optional.of(testQueueToken));
@@ -124,8 +124,8 @@ class QueueServiceTest {
     void getQueuePosition_tokenNotFound() {
 
         // Given
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueTokenRepository.findByToken(testToken))
                     .thenReturn(Optional.empty());
@@ -133,7 +133,7 @@ class QueueServiceTest {
             // When & Then
             assertThatThrownBy(() -> queueService.getQueuePosition())
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
         }
     }
 
@@ -151,8 +151,8 @@ class QueueServiceTest {
                 .expiresAt(LocalDateTime.now().minusMinutes(10))
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueTokenRepository.findByToken(testToken))
                     .thenReturn(Optional.of(expiredToken));
@@ -160,7 +160,7 @@ class QueueServiceTest {
             // When & Then
             assertThatThrownBy(() -> queueService.getQueuePosition())
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH005.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXPIRED_TOKEN.getCode());
         }
     }
 
@@ -192,7 +192,7 @@ class QueueServiceTest {
         // When & Then
         assertThatThrownBy(() -> queueService.validateToken(testToken))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
     }
 
     @Test
@@ -215,7 +215,7 @@ class QueueServiceTest {
         // When & Then
         assertThatThrownBy(() -> queueService.validateToken(testToken))
                 .isInstanceOf(AppException.class)
-                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH005.getCode());
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.EXPIRED_TOKEN.getCode());
     }
 
     @Test

@@ -3,10 +3,7 @@ package kr.hhplus.be.server.domain.user.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Builder
 @DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
@@ -60,7 +58,7 @@ public class User {
     // 잔액 충전 메서드
     public void chargeBalance(int amount) {
         if (amount <= 0) {
-            throw new AppException(ErrorCode.PAYMENT003);
+            throw new AppException(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
         this.balance += amount;
     }
@@ -68,10 +66,10 @@ public class User {
     // 잔액 사용 메서드
     public void useBalance(int amount) {
         if (amount <= 0) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
         if (this.balance < amount) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
         this.balance -= amount;
     }

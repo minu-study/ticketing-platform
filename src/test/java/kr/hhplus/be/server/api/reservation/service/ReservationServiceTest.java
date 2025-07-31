@@ -4,7 +4,7 @@ import kr.hhplus.be.server.api.payment.service.PaymentService;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.eventSchedule.repository.EventScheduleRepository;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.reservation.dto.ReservationDto;
@@ -102,8 +102,8 @@ class ReservationServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(tokenInfo);
             when(seatRepository.findById(testSeatId)).thenReturn(Optional.of(testSeat));
@@ -137,16 +137,16 @@ class ReservationServiceTest {
         request.setScheduleId(testScheduleId);
         request.setSeatId(testSeatId);
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH004));
+                    .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository, never()).findById(any());
@@ -168,8 +168,8 @@ class ReservationServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(tokenInfo);
             when(seatRepository.findById(testSeatId)).thenReturn(Optional.empty());
@@ -177,7 +177,7 @@ class ReservationServiceTest {
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DB001.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DATA_NOT_FOUND.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository).findById(testSeatId);
@@ -202,8 +202,8 @@ class ReservationServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(tokenInfo);
             when(seatRepository.findById(testSeatId)).thenReturn(Optional.of(testSeat));
@@ -211,7 +211,7 @@ class ReservationServiceTest {
             // When & Then
             assertThatThrownBy(() -> reservationService.createReservation(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RESERVATION001.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository).findById(testSeatId);
@@ -241,8 +241,8 @@ class ReservationServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(tokenInfo);
             when(reservationRepository.getReservationList(testUserId)).thenReturn(mockReservationList);

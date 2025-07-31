@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.api.event.controller;
 
+import kr.hhplus.be.server.common.util.ResponseUtil;
 import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.api.event.service.EventService;
 import kr.hhplus.be.server.common.model.ApiResponse;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,8 @@ public class EventController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse> getEvents(EventDto.GetEventList.Request param) {
-        log.info("getEventList param : {}", param);
         EventDto.GetEventList.Response response = eventService.getEventList(param);
-        log.info("getEventList response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -34,9 +32,7 @@ public class EventController {
      */
     @GetMapping("/schedules")
     public ResponseEntity<ApiResponse> getAvailableSchedules(EventDto.GetEventScheduleList.Request param) {
-        log.info("getAvailableEventSchedules param : {}", param);
         EventDto.GetEventScheduleList.Response response = eventService.getAvailableEventSchedules(param);
-        log.info("getAvailableEventSchedules response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 }

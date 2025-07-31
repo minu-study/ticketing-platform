@@ -5,7 +5,8 @@ import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.api.reservation.service.ReservationService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
+import kr.hhplus.be.server.domain.balanceLog.vo.BalanceActionEnums;
 import kr.hhplus.be.server.domain.payment.dto.PaymentDto;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
@@ -30,8 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.hhplus.be.server.domain.payment.entity.QPayment.payment;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -51,7 +50,7 @@ public class PaymentService {
     @Transactional
     public void processPayment(PaymentDto.SetPayment.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
         UUID userId = tokenInfo.getUserId();
 
@@ -60,18 +59,18 @@ public class PaymentService {
         Reservation reservation = reservationRepository.findById(param.getReservationId())
                 .orElseThrow(() ->  {
                     log.error("Reservation not found for reservationId: {}", param.getReservationId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         // Temp 상태 예약이 아니거나 예약이 만료된 경우 결제 안됨
         if (!ReservationStatusEnums.TEMP.getStatus().equals(reservation.getStatus()) || reservation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new AppException(ErrorCode.PAYMENT005);
+            throw new AppException(ErrorCode.INVALID_RESERVATION_STATUS_FOR_PAYMENT);
         }
 
         Seat seat = seatRepository.findById(reservation.getSeatId())
                 .orElseThrow(() ->  {
                     log.error("Seat not found for seatId: {}", reservation.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         int paymentAmount = SeatTypeAndValueEnums.valueOf(seat.getSeatType()).getValue();
@@ -79,11 +78,11 @@ public class PaymentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->  {
                     log.error("User not found for userId: {}", userId);
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         if (user.getBalance() < paymentAmount) {
-            throw new AppException(ErrorCode.PAYMENT001);
+            throw new AppException(ErrorCode.INSUFFICIENT_PAYMENT_AMOUNT);
         }
 
         Payment payment = Payment.create(userId, param.getReservationId(), paymentAmount);
@@ -106,12 +105,12 @@ public class PaymentService {
             queueService.expireToken(token);
 
             // 결제 로깅
-            balanceLogService.savePaymentLogAsync(user, paymentAmount);
+            balanceLogService.saveLogAsync(user.getId(), paymentAmount, BalanceActionEnums.USE.getAction());
 
         } catch (Exception e) {
             log.error("Payment processing failed for reservation: {}", param.getReservationId(), e);
             updateFailPayment(payment);
-            throw new AppException(ErrorCode.PAYMENT007);
+            throw new AppException(ErrorCode.PAYMENT_PROCESSING_ERROR);
         }
 
     }
@@ -122,7 +121,7 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public PaymentDto.GetPayment.Response getPayment(PaymentDto.GetPayment.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         List<PaymentDto.PaymentView> list = paymentRepository.getPaymentList(param.getUserId());
@@ -151,13 +150,13 @@ public class PaymentService {
             User user = userRepository.findById(reservation.getUserId())
                     .orElseThrow(() -> {
                         log.error("User not found for userId: {}", reservation.getUserId());
-                        return new AppException(ErrorCode.DB001);
+                        return new AppException(ErrorCode.DATA_NOT_FOUND);
                     });
 
             user.chargeBalance(payment.getAmount());
             userRepository.save(user);
 
-            balanceLogService.savePaymentRefundLogAsync(user, payment.getAmount());
+            balanceLogService.saveLogAsync(user.getId(), payment.getAmount(), BalanceActionEnums.REFUND.getAction());
 
         }
 

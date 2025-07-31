@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.api.queue.controller;
 
+import kr.hhplus.be.server.common.util.ResponseUtil;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.model.ApiResponse;
-import kr.hhplus.be.server.common.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +23,8 @@ public class QueueController {
      */
     @PostMapping("/token")
     public ResponseEntity<ApiResponse> issueToken(@RequestBody QueueDto.GetQueueToken.Request param) {
-        log.info("issueToken param : {}", param);
         QueueDto.GetQueueToken.Response response = queueService.issueToken(param);
-        log.info("issueToken response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -36,8 +34,7 @@ public class QueueController {
     @GetMapping("/position")
     public ResponseEntity<ApiResponse> getQueuePosition() {
         QueueDto.GetQueuePosition.Response response = queueService.getQueuePosition();
-        log.info("getQueuePosition response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
 }

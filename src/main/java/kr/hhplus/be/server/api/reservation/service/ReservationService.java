@@ -4,7 +4,7 @@ import kr.hhplus.be.server.api.payment.service.PaymentService;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.reservation.dto.ReservationDto;
 import kr.hhplus.be.server.domain.eventSchedule.entity.EventSchedule;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +41,18 @@ public class ReservationService {
     @Transactional
     public ReservationDto.SetReservation.Response createReservation(ReservationDto.SetReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
 
         Seat seat = seatRepository.findById(param.getSeatId())
                 .orElseThrow(() -> {
                     log.error("Seat not found for seatId: {}", param.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         if (!isAvailableForReservationSeat(seat)) {
             log.error("Seat is not available for reservation: {}", param.getSeatId());
-            throw new AppException(ErrorCode.RESERVATION001);
+            throw new AppException(ErrorCode.SEAT_NOT_AVAILABLE);
         }
 
         // 임시 예약 생성
@@ -82,7 +81,7 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationDto.GetReservationList.Response getReservationList() {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         QueueDto.QueueTokenValidationView tokenInfo = queueService.validateToken(token);
 
         List<ReservationDto.ReservationSummaryView> list = reservationRepository.getReservationList(tokenInfo.getUserId());
@@ -95,7 +94,7 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationDto.GetReservation.Response getReservation(ReservationDto.GetReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         ReservationDto.ReservationDetailView view = reservationRepository.getReservationDetail(param.getReservationId());
@@ -108,32 +107,32 @@ public class ReservationService {
     @Transactional
     public void cancelReservation(ReservationDto.CancelReservation.Request param) {
 
-        String token = CommonUtil.getQueueToken();
+        String token = TokenExtractor.getQueueToken();
         queueService.validateToken(token);
 
         Reservation reservation = reservationRepository.findById(param.getReservationId())
                 .orElseThrow(() ->  {
                     log.error("reservation not found for reservationId: {}", param.getReservationId());
-                    throw new AppException(ErrorCode.DB001);
+                    throw new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         // 취소 가능한 상태인지 확인
         if (Boolean.TRUE.equals(isCancelAvailableForReservation(reservation))) {
             log.error("cancelReservation, reservation is not cancel available for reservationId: {}", param.getReservationId());
-            throw new AppException(ErrorCode.PAYMENT008);
+            throw new AppException(ErrorCode.RESERVATION_CANNOT_BE_CANCELED);
         }
 
         reservation.setStatus(ReservationStatusEnums.CANCELED.getStatus());
         reservation.setCanceledAt(LocalDateTime.now());
         reservationRepository.save(reservation);
 
-        Optional<Seat> seatOptional = seatRepository.findById(reservation.getSeatId());
-        if (seatOptional.isPresent()) {
-            Seat seat = seatOptional.get();
-            seat.setStatus(SeatStatusEnums.AVAILABLE.getStatus());
-            seat.setHoldExpiresAt(null);
-            seatRepository.save(seat);
-        }
+        seatRepository.findById(reservation.getSeatId()).ifPresent(
+                seat -> {
+                    seat.setStatus(SeatStatusEnums.AVAILABLE.getStatus());
+                    seat.setHoldExpiresAt(null);
+                    seatRepository.save(seat);
+                }
+        );
 
         paymentService.paymentRefund(reservation);
     }
@@ -146,7 +145,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() ->  {
                     log.error("Reservation not found for reservationId: {}", reservationId);
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
 
         reservation.setStatus(ReservationStatusEnums.CONFIRMED.getStatus());
@@ -156,7 +155,7 @@ public class ReservationService {
         Seat seat = seatRepository.findById(reservation.getSeatId())
                 .orElseThrow(() ->  {
                     log.error("Seat not found for seatId: {}", reservation.getSeatId());
-                    return new AppException(ErrorCode.DB001);
+                    return new AppException(ErrorCode.DATA_NOT_FOUND);
                 });
         seat.setStatus(SeatStatusEnums.RESERVED.getStatus());
         seat.setHoldExpiresAt(null);
@@ -199,7 +198,7 @@ public class ReservationService {
             EventSchedule eventSchedule = eventScheduleRepository.findById(reservation.getScheduleId())
                     .orElseThrow(() -> {
                         log.error("isCancelAvailableForReservation_EventSchedule not found for scheduleId: {}", reservation.getScheduleId());
-                        return new AppException(ErrorCode.DB001);
+                        return new AppException(ErrorCode.DATA_NOT_FOUND);
                     });
 
             LocalDateTime cancelDeadline = eventSchedule.getStartDateTime().minusDays(1);

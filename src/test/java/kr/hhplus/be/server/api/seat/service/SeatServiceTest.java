@@ -3,7 +3,7 @@ package kr.hhplus.be.server.api.seat.service;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
 import kr.hhplus.be.server.domain.seat.dto.SeatDto;
 import kr.hhplus.be.server.domain.seat.entity.Seat;
@@ -85,8 +85,8 @@ class SeatServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(validationView);
             when(seatRepository.getSeats(eq(testScheduleId), any(LocalDateTime.class)))
@@ -116,16 +116,16 @@ class SeatServiceTest {
         SeatDto.getSeats.Request request = new SeatDto.getSeats.Request();
         request.setScheduleId(testScheduleId);
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
-                    .thenThrow(new AppException(ErrorCode.AUTH004));
+                    .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
 
             // When & Then
             assertThatThrownBy(() -> seatService.getSeats(request))
                     .isInstanceOf(AppException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.AUTH004.getCode());
+                    .hasFieldOrPropertyWithValue("errorCode", ErrorCode.INVALID_TOKEN.getCode());
             
             verify(queueService).validateToken(testToken);
             verify(seatRepository, never()).getSeats(any(), any());
@@ -144,8 +144,8 @@ class SeatServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(validationView);
             when(seatRepository.getSeats(eq(testScheduleId), any(LocalDateTime.class)))

@@ -3,7 +3,7 @@ package kr.hhplus.be.server.api.user.controller;
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.api.user.service.UserService;
 import kr.hhplus.be.server.common.model.ApiResponse;
-import kr.hhplus.be.server.common.util.CommonUtil;
+import kr.hhplus.be.server.common.util.ResponseUtil;
 import kr.hhplus.be.server.domain.balanceLog.dto.BalanceDto;
 import kr.hhplus.be.server.domain.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +26,8 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody UserDto.SetUser.Request param) {
-        log.info("createUser param : {}", param);
         userservice.createUser(param);
-        return CommonUtil.convertResponse();
+        return ResponseUtil.convertResponse();
     }
 
     /**
@@ -38,8 +37,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse> getUser() {
         UserDto.GetUser.Response response = userservice.getUser();
-        log.info("getUser response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
     /**
@@ -48,10 +46,8 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse> chargeBalance(@Valid @RequestBody BalanceDto.ChargeBalance.Request param) {
-        log.info("chargeBalance param : {}", param);
         BalanceDto.ChargeBalance.Response response = userservice.chargeBalance(param);
-        log.info("chargeBalance response : {}", response);
-        return CommonUtil.convertResponse(response);
+        return ResponseUtil.convertResponse(response);
     }
 
 
