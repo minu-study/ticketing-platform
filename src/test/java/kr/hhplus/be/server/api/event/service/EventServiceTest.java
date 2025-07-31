@@ -3,6 +3,7 @@ package kr.hhplus.be.server.api.event.service;
 import kr.hhplus.be.server.api.queue.service.QueueService;
 import kr.hhplus.be.server.common.exception.AppException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
+import kr.hhplus.be.server.common.util.TokenExtractor;
 import kr.hhplus.be.server.domain.event.dto.EventDto;
 import kr.hhplus.be.server.domain.event.repository.EventRepository;
 import kr.hhplus.be.server.domain.queueToken.dto.QueueDto;
@@ -79,8 +80,8 @@ class EventServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(validationView);
             when(eventRepository.getEventList(testCategoryId)).thenReturn(mockEventList);
@@ -107,8 +108,8 @@ class EventServiceTest {
         EventDto.GetEventList.Request request = new EventDto.GetEventList.Request();
         request.setCategoryId(testCategoryId);
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
                     .thenThrow(new AppException(ErrorCode.INVALID_TOKEN));
@@ -167,8 +168,8 @@ class EventServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(validationView);
             when(eventRepository.getEventScheduleInfo(eq(testEventId), any(LocalDateTime.class)))
@@ -196,8 +197,8 @@ class EventServiceTest {
         EventDto.GetEventScheduleList.Request request = new EventDto.GetEventScheduleList.Request();
         request.setEventId(testEventId);
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken))
                     .thenThrow(new AppException(ErrorCode.EXPIRED_TOKEN));
@@ -225,8 +226,8 @@ class EventServiceTest {
                 .userId(testUserId)
                 .build();
 
-        try (MockedStatic<CommonUtil> mockedCommonUtil = mockStatic(CommonUtil.class)) {
-            mockedCommonUtil.when(CommonUtil::getQueueToken).thenReturn(testToken);
+        try (MockedStatic<TokenExtractor> mockedCommonUtil = mockStatic(TokenExtractor.class)) {
+            mockedCommonUtil.when(TokenExtractor::getQueueToken).thenReturn(testToken);
             
             when(queueService.validateToken(testToken)).thenReturn(validationView);
             when(eventRepository.getEventScheduleInfo(eq(testEventId), any(LocalDateTime.class)))
