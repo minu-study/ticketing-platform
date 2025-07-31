@@ -22,7 +22,6 @@ public class PaymentController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse> processPayment(@RequestBody PaymentDto.SetPayment.Request param) {
-        log.info("processPayment param : {}", param);
         paymentService.processPayment(param);
         return ResponseUtil.convertResponse();
     }
@@ -32,9 +31,7 @@ public class PaymentController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse> getPaymentList(PaymentDto.GetPayment.Request param) {
-        log.info("getPaymentList param : {}", param);
         PaymentDto.GetPayment.Response response = paymentService.getPayment(param);
-        log.info("getPaymentList response : {}", response);
         return ResponseUtil.convertResponse(response);
 
     }

@@ -23,9 +23,7 @@ public class QueueController {
      */
     @PostMapping("/token")
     public ResponseEntity<ApiResponse> issueToken(@RequestBody QueueDto.GetQueueToken.Request param) {
-        log.info("issueToken param : {}", param);
         QueueDto.GetQueueToken.Response response = queueService.issueToken(param);
-        log.info("issueToken response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 
@@ -36,7 +34,6 @@ public class QueueController {
     @GetMapping("/position")
     public ResponseEntity<ApiResponse> getQueuePosition() {
         QueueDto.GetQueuePosition.Response response = queueService.getQueuePosition();
-        log.info("getQueuePosition response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 

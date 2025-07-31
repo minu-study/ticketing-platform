@@ -22,9 +22,7 @@ public class ReservationController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse> createReservation(@RequestBody ReservationDto.SetReservation.Request param) {
-        log.info("createReservation param : {}", param);
         ReservationDto.SetReservation.Response response = reservationService.createReservation(param);
-        log.info("createReservation response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 
@@ -42,9 +40,7 @@ public class ReservationController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse> getReservation(@RequestBody ReservationDto.GetReservation.Request param) {
-        log.info("getReservation param : {}", param);
         ReservationDto.GetReservation.Response response = reservationService.getReservation(param);
-        log.info("getReservation response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 
@@ -53,7 +49,6 @@ public class ReservationController {
      */
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<ApiResponse> cancelReservation(@RequestBody ReservationDto.CancelReservation.Request param) {
-        log.info("cancelReservation param : {}", param);
         reservationService.cancelReservation(param);
         return ResponseUtil.convertResponse();
     }

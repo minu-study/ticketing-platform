@@ -22,9 +22,7 @@ public class EventController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse> getEvents(EventDto.GetEventList.Request param) {
-        log.info("getEventList param : {}", param);
         EventDto.GetEventList.Response response = eventService.getEventList(param);
-        log.info("getEventList response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 
@@ -34,9 +32,7 @@ public class EventController {
      */
     @GetMapping("/schedules")
     public ResponseEntity<ApiResponse> getAvailableSchedules(EventDto.GetEventScheduleList.Request param) {
-        log.info("getAvailableEventSchedules param : {}", param);
         EventDto.GetEventScheduleList.Response response = eventService.getAvailableEventSchedules(param);
-        log.info("getAvailableEventSchedules response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 }

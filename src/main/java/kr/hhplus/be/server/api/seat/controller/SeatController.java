@@ -26,9 +26,7 @@ public class SeatController {
      */
     @GetMapping
     public ResponseEntity<ApiResponse> getSeats(@Valid SeatDto.getSeats.Request param) {
-        log.info("getAvailableSeats param : {}", param);
         SeatDto.getSeats.Response response = seatService.getSeats(param);
-        log.info("getAvailableSeats response : {}", response);
         return ResponseUtil.convertResponse(response);
     }
 
